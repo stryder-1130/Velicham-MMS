@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velicham - View Entries</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background: white;
+            color: #1976d2;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #1976d2;
+            color: white;
+        }
+        td.amount {
+            font-family: "Times New Roman", serif;
+        }
+        .actions button {
+            padding: 5px 8px;
+            margin: 0 2px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .edit-btn {
+            background-color: #42a5f5;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #e53935;
+            color: white;
+        }
+        .export-buttons {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .export-buttons button {
+            flex: 1;
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .export-buttons button:hover {
+            background-color: #42a5f5;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Velicham - View Entries
+        <button class="back-btn" onclick="window.location.href='add-entry.html'">← Back</button>
+    </header>
+
+    <div class="container">
+        <div class="filters">
+            <input type="text" id="nameFilter" placeholder="Filter by name" oninput="renderEntries()">
+            <input type="date" id="dateFilter" onchange="renderEntries()">
+        </div>
+
+        <table id="entriesTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="export-buttons">
+            <button onclick="exportCSV()">Export CSV/Excel</button>
+            <button onclick="exportPDF()">Export PDF</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        let entries = JSON.parse(localStorage.getItem("entries")) || [];
+
+        function renderEntries() {
+            const tbody = document.querySelector("#entriesTable tbody");
+            tbody.innerHTML = "";
+
+            const nameFilter = document.getElementById("nameFilter").value.toLowerCase();
+            const dateFilter = document.getElementById("dateFilter").value;
+
+            entries.forEach((entry, index) => {
+                if (
+                    (nameFilter && !entry.name.toLowerCase().includes(nameFilter)) ||
+                    (dateFilter && entry.date !== new Date(dateFilter).toLocaleDateString())
+                ) return;
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${entry.name}</td>
+                    <td class="amount">₹${entry.amount}</td>
+                    <td>${entry.date}</td>
+                    <td class="actions">
+                        <button class="edit-btn" onclick="editEntry(${index})">Edit</button>
+                        <button class="delete-btn" onclick="deleteEntry(${index})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function editEntry(index) {
+            const newName = prompt("Edit Name:", entries[index].name);
+            const newAmount = prompt("Edit Amount:", entries[index].amount);
+            if (newName && newAmount) {
+                entries[index].name = newName;
+                entries[index].amount = parseFloat(newAmount);
+                localStorage.setItem("entries", JSON.stringify(entries));
+                renderEntries();
+            }
+        }
+
+        function deleteEntry(index) {
+            if (confirm("Are you sure you want to delete this entry?")) {
+                entries.splice(index, 1);
+                localStorage.setItem("entries", JSON.stringify(entries));
+                renderEntries();
+            }
+        }
+
+        function exportCSV() {
+            let csv = "Name,Amount,Date\n";
+            entries.forEach(entry => {
+                csv += `${entry.name},${entry.amount},${entry.date}\n`;
+            });
+            const blob = new Blob([csv], { type: "text/csv" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "velicham_entries.csv";
+            link.click();
+        }
+
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+
+            doc.text("Velicham Entries", 14, 10);
+            let y = 20;
+            entries.forEach(entry => {
+                doc.text(`${entry.name}  -  ₹${entry.amount}  -  ${entry.date}`, 14, y);
+                y += 8;
+            });
+
+            const total = entries.reduce((sum, e) => sum + e.amount, 0);
+            doc.text(`Total: ₹${total}`, 14, y + 5);
+
+            doc.save("velicham_entries.pdf");
+        }
+
+        renderEntries();
+    </script>
+
+</body>
+</html>

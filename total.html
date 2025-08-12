@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velicham - Total</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background: white;
+            color: #1976d2;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #f7f9fc;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .total-box {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-size: 18px;
+        }
+        .amount {
+            font-family: "Times New Roman", serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Velicham - Totals
+        <button class="back-btn" onclick="window.location.href='add-entry.html'">← Back</button>
+    </header>
+
+    <div class="container">
+        <div class="total-box">
+            <div>Overall Total</div>
+            <div class="amount" id="overallTotal">₹0</div>
+        </div>
+
+        <div class="total-box">
+            <div>Today's Total</div>
+            <div class="amount" id="todayTotal">₹0</div>
+        </div>
+    </div>
+
+    <script>
+        let entries = JSON.parse(localStorage.getItem("entries")) || [];
+
+        function calculateTotals() {
+            let overall = 0;
+            let todayTotal = 0;
+            const todayDate = new Date().toLocaleDateString();
+
+            entries.forEach(entry => {
+                overall += entry.amount;
+                if (entry.date === todayDate) {
+                    todayTotal += entry.amount;
+                }
+            });
+
+            document.getElementById("overallTotal").textContent = `₹${overall}`;
+            document.getElementById("todayTotal").textContent = `₹${todayTotal}`;
+        }
+
+        calculateTotals();
+    </script>
+
+</body>
+</html>
