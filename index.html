@@ -3,84 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velicham - Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-container {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 350px;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #1976d2;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        button {
-            width: 100%;
-            background-color: #1976d2;
-            color: white;
-            border: none;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #42a5f5;
-        }
-        .error {
-            color: red;
-            font-size: 14px;
-            text-align: center;
-            display: none;
-            margin-top: 10px;
-        }
-    </style>
+    <title>Redirecting...</title>
+    <meta http-equiv="refresh" content="0; url=home.html">
+    <script>
+        // Fallback in case meta refresh doesn't work
+        window.location.href = "home.html";
+    </script>
 </head>
 <body>
-
-    <div class="login-container">
-        <h2>Velicham Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <div class="error" id="error-message">Invalid username or password</div>
-    </div>
-
-    <script>
-        function login() {
-            const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
-
-            if (user === "aravindh" && pass === "stryder@1130") {
-                window.location.href = "add-entry.html";
-            } else {
-                document.getElementById('error-message').style.display = 'block';
-            }
-        }
-    </script>
-
+    <p>Redirecting to <a href="home.html">home page</a>...</p>
 </body>
 </html>
